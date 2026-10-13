@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="es" class="dark">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CtOS // Security Operations Center</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        cyber: {
+                            bg: '#090d16',
+                            card: '#0f172a',
+                            border: '#1e293b',
+                            cyan: '#00f0ff',
+                            magenta: '#ff0055',
+                            yellow: '#facc15',
+                            green: '#10b981',
+                            dark: '#05070b',
+                            text: '#94a3b8',
+                            light: '#e2e8f0'
+                        }
+                    },
+                    fontFamily: {
+                        mono: ['Courier New', 'Courier', 'monospace']
+                    }
+                }
+            }
+        }
+    </script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <link rel="stylesheet" href="style.css" />
+</head>
+<body class="min-h-screen flex flex-col justify-between selection:bg-cyber-cyan selection:text-cyber-dark">
+    <header class="bg-cyber-dark border-b border-cyber-border px-4 py-3 flex flex-wrap justify-between items-center z-40 sticky top-0 backdrop-blur-md bg-opacity-95">
+        <div class="flex items-center space-x-3">
+            <div class="w-3 h-3 bg-cyber-cyan rounded-full animate-pulse"></div>
+            <h1 class="text-base md:text-lg font-bold tracking-wider text-cyber-light glow-cyan uppercase">
+                <i class="fa-solid fa-shield-halved text-cyber-cyan mr-2"></i>CtOS // SOC Command Center
+            </h1>
+            <span class="hidden sm:inline-block text-[11px] px-2 py-0.5 border border-cyber-cyan/40 text-cyber-cyan bg-cyber-cyan/10 rounded font-mono">SECOPS_SUITE_v4.8</span>
+        </div>
+        <div class="flex items-center space-x-3 text-xs mt-2 sm:mt-0">
+            <div class="flex items-center space-x-1.5 px-3 py-1 border border-cyber-border bg-cyber-card rounded text-cyber-light">
+                <i class="fa-solid fa-network-wired text-cyber-cyan"></i>
+                <span>MODE: <strong class="text-cyber-cyan">ANALYST TOOLKIT</strong></span>
+            </div>
+            <div class="text-cyber-green font-bold px-2 py-1 bg-cyber-green/10 border border-cyber-green/30 rounded flex items-center space-x-1">
+                <i class="fa-solid fa-lock text-xs"></i><span>SSL SECURE</span>
+            </div>
+        </div>
+    </header>
+
+    <nav class="bg-cyber-dark/80 border-b border-cyber-border px-4 py-2 flex flex-wrap gap-2 z-30">
+        <button onclick="switchTab('intel')" id="btn-intel" class="tab-btn px-4 py-2 text-xs md:text-sm font-bold border border-cyber-cyan bg-cyber-cyan text-cyber-dark rounded transition shadow-lg flex items-center space-x-2">
+            <i class="fa-solid fa-globe"></i><span>Threat Intel</span>
+        </button>
+        <button onclick="switchTab('cve')" id="btn-cve" class="tab-btn px-4 py-2 text-xs md:text-sm font-bold border border-cyber-border text-cyber-text hover:text-cyber-cyan hover:border-cyber-cyan rounded transition flex items-center space-x-2 bg-cyber-card">
+            <i class="fa-solid fa-database"></i><span>Vuln Database</span>
+        </button>
+        <button onclick="switchTab('crypto')" id="btn-crypto" class="tab-btn px-4 py-2 text-xs md:text-sm font-bold border border-cyber-border text-cyber-text hover:text-cyber-cyan hover:border-cyber-cyan rounded transition flex items-center space-x-2 bg-cyber-card">
+            <i class="fa-solid fa-key"></i><span>Hash Lab</span>
+        </button>
+        <button onclick="switchTab('headers')" id="btn-headers" class="tab-btn px-4 py-2 text-xs md:text-sm font-bold border border-cyber-border text-cyber-text hover:text-cyber-cyan hover:border-cyber-cyan rounded transition flex items-center space-x-2 bg-cyber-card">
+            <i class="fa-solid fa-file-shield"></i><span>Security Headers</span>
+        </button>
+        <button onclick="switchTab('net')" id="btn-net" class="tab-btn px-4 py-2 text-xs md:text-sm font-bold border border-cyber-border text-cyber-text hover:text-cyber-cyan hover:border-cyber-cyan rounded transition flex items-center space-x-2 bg-cyber-card">
+            <i class="fa-solid fa-wifi"></i><span>Network Monitor</span>
+        </button>
+        <button onclick="switchTab('defense')" id="btn-defense" class="tab-btn px-4 py-2 text-xs md:text-sm font-bold border border-cyber-border text-cyber-text hover:text-cyber-cyan hover:border-cyber-cyan rounded transition flex items-center space-x-2 bg-cyber-card">
+            <i class="fa-solid fa-shield-heart"></i><span>Hardening</span>
+        </button>
+        <button onclick="toggleCodeWindow()" id="btn-code-window" class="ml-auto px-3 py-2 text-[11px] font-bold border border-cyber-cyan/60 text-cyber-cyan bg-cyber-card rounded transition hover:bg-cyber-cyan hover:text-cyber-dark flex items-center space-x-2">
+            <i class="fa-solid fa-code"></i><span>VER CÓDIGO</span>
+        </button>
+    </nav>
+
+    <main class="flex-1 max-w-7xl w-full mx-auto p-4 md:p-6 flex flex-col z-20">
+        <section class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 mb-4">
+            <div class="bg-cyber-card border border-cyber-border rounded-lg p-4">
+                <div class="text-[10px] uppercase tracking-wider text-cyber-text">Critical Assets</div>
+                <div class="mt-2 flex items-center justify-between">
+                    <span class="text-2xl font-bold text-cyber-light">24</span>
+                    <span class="text-cyber-cyan"><i class="fa-solid fa-server"></i></span>
+                </div>
+                <div class="mt-2 text-[10px] text-cyber-text">Protected endpoints</div>
+            </div>
+            <div class="bg-cyber-card border border-cyber-border rounded-lg p-4">
+                <div class="text-[10px] uppercase tracking-wider text-cyber-text">High Risk</div>
+                <div class="mt-2 flex items-center justify-between">
+                    <span class="text-2xl font-bold text-cyber-magenta">03</span>
+                    <span class="text-cyber-magenta"><i class="fa-solid fa-triangle-exclamation"></i></span>
+                </div>
+                <div class="mt-2 text-[10px] text-cyber-text">Needs immediate review</div>
+            </div>
+            <div class="bg-cyber-card border border-cyber-border rounded-lg p-4">
+                <div class="text-[10px] uppercase tracking-wider text-cyber-text">Open Incidents</div>
+                <div class="mt-2 flex items-center justify-between">
+                    <span class="text-2xl font-bold text-cyber-yellow">11</span>
+                    <span class="text-cyber-yellow"><i class="fa-solid fa-bell"></i></span>
+                </div>
+                <div class="mt-2 text-[10px] text-cyber-text">Triggered in last 7 days</div>
+            </div>
+            <div class="bg-cyber-card border border-cyber-border rounded-lg p-4">
+                <div class="text-[10px] uppercase tracking-wider text-cyber-text">Compliance</div>
+                <div class="mt-2 flex items-center justify-between">
+                    <span class="text-2xl font-bold text-cyber-green">94%</span>
+                    <span class="text-cyber-green"><i class="fa-solid fa-circle-check"></i></span>
+                </div>
+                <div class="mt-2 text-[10px] text-cyber-text">Alignment with policy baseline</div>
+            </div>
+        </section>
+
+        <div id="tab-intel" class="tab-content flex-1 flex flex-col space-y-4">
+            <div class="bg-cyber-card border border-cyber-border p-5 rounded-lg border-glow-cyan">
+                <h2 class="text-sm font-bold text-cyber-light uppercase tracking-wider mb-2 flex items-center">
+                    <i class="fa-solid fa-radar text-cyber-cyan mr-2"></i> Búsqueda de Inteligencia IP / Host
+                </h2>
+                <p class="text-xs text-cyber-text mb-4">Ingresa una dirección IP pública o un nombre de dominio (ej. 8.8.8.8 o example.com) para analizar geolocalización, ASN y registros de red.</p>
+                <div class="flex flex-col sm:flex-row gap-2">
+                    <input type="text" id="ip-input" placeholder="Ej. 1.1.1.1 o scanme.nmap.org" class="flex-1 bg-cyber-dark border border-cyber-border px-3.5 py-2.5 rounded text-cyber-light text-xs font-mono focus:outline-none focus:border-cyber-cyan" />
+                    <button onclick="lookupIP()" class="px-5 py-2.5 bg-cyber-cyan text-cyber-dark font-bold rounded text-xs hover:opacity-90 transition flex items-center justify-center space-x-2">
+                        <i class="fa-solid fa-magnifying-glass"></i><span>ANALIZAR OBJETIVO</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="bg-cyber-card border border-cyber-border p-4 rounded-lg flex flex-col justify-between">
+                    <div class="text-xs text-cyber-text font-bold uppercase mb-1">Geolocalización & ISP</div>
+                    <div id="res-geo" class="text-xs text-cyber-light space-y-1 font-mono bg-cyber-dark p-3 rounded border border-cyber-border min-h-[100px]">
+                        > Esperando consulta...
+                    </div>
+                </div>
+                <div class="bg-cyber-card border border-cyber-border p-4 rounded-lg flex flex-col justify-between">
+                    <div class="text-xs text-cyber-text font-bold uppercase mb-1">ASN & Red IP</div>
+                    <div id="res-asn" class="text-xs text-cyber-light space-y-1 font-mono bg-cyber-dark p-3 rounded border border-cyber-border min-h-[100px]">
+                        > Esperando consulta...
+                    </div>
+                </div>
+                <div class="bg-cyber-card border border-cyber-border p-4 rounded-lg flex flex-col justify-between">
+                    <div class="text-xs text-cyber-text font-bold uppercase mb-1">Puertos / Estado</div>
+                    <div id="res-ports" class="text-xs text-cyber-light space-y-1 font-mono bg-cyber-dark p-3 rounded border border-cyber-border min-h-[100px]">
+                        > Esperando consulta...
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="tab-cve" class="tab-content hidden flex-1 flex flex-col space-y-4">
+            <div class="bg-cyber-card border border-cyber-border p-5 rounded-lg border-glow-cyan">
+                <h2 class="text-sm font-bold text-cyber-light uppercase tracking-wider mb-2 flex items-center">
+                    <i class="fa-solid fa-database text-cyber-cyan mr-2"></i> Buscador de Vulnerabilidades (Base de Datos CVE)
+                </h2>
+                <p class="text-xs text-cyber-text mb-4">Busca vulnerabilidades conocidas por código, software o severidad.</p>
+                <div class="flex flex-col sm:flex-row gap-2">
+                    <input type="text" id="cve-search-input" placeholder="Buscar CVE (ej. CVE-2024, OpenSSH, Log4j)..." class="flex-1 bg-cyber-dark border border-cyber-border px-3.5 py-2.5 rounded text-cyber-light text-xs font-mono focus:outline-none focus:border-cyber-cyan" />
+                    <button onclick="searchCVE()" class="px-5 py-2.5 bg-cyber-cyan text-cyber-dark font-bold rounded text-xs hover:opacity-90 transition flex items-center justify-center space-x-2">
+                        <i class="fa-solid fa-search"></i><span>CONSULTAR CVE</span>
+                    </button>
+                </div>
+            </div>
+
+            <div id="cve-results-container" class="space-y-3">
+                <div class="bg-cyber-card border border-cyber-border p-4 rounded-lg text-xs text-cyber-text">
+                    Busca una vulnerabilidad, software o keyword para mostrar resultados reales de la base NVD.
+                </div>
+            </div>
+        </div>
+
+        <div id="tab-crypto" class="tab-content hidden flex-1 flex flex-col space-y-4">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                <div class="bg-cyber-card border border-cyber-border p-5 rounded-lg flex flex-col space-y-4 border-glow-cyan">
+                    <h3 class="text-xs font-bold text-cyber-light uppercase tracking-widest border-b border-cyber-border pb-2">
+                        <i class="fa-solid fa-key text-cyber-cyan mr-1"></i> Generador de Hashes Criptográficos
+                    </h3>
+                    <div class="space-y-2">
+                        <label class="text-xs text-cyber-text">Texto de entrada:</label>
+                        <input type="text" id="hash-input" oninput="generateHashes()" placeholder="Escribe contraseña o texto aquí..." class="w-full bg-cyber-dark border border-cyber-border px-3 py-2 rounded text-cyber-light text-xs font-mono focus:outline-none focus:border-cyber-cyan" />
+                    </div>
+                    <div class="space-y-3 pt-2">
+                        <div>
+                            <div class="text-[11px] text-cyber-text mb-1">MD5:</div>
+                            <div id="hash-md5" class="bg-cyber-dark p-2 rounded border border-cyber-border text-xs text-cyber-cyan font-mono select-all break-all">-</div>
+                        </div>
+                        <div>
+                            <div class="text-[11px] text-cyber-text mb-1">SHA-1:</div>
+                            <div id="hash-sha1" class="bg-cyber-dark p-2 rounded border border-cyber-border text-xs text-cyber-cyan font-mono select-all break-all">-</div>
+                        </div>
+                        <div>
+                            <div class="text-[11px] text-cyber-text mb-1">SHA-256:</div>
+                            <div id="hash-sha256" class="bg-cyber-dark p-2 rounded border border-cyber-border text-xs text-cyber-cyan font-mono select-all break-all">-</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-cyber-card border border-cyber-border p-5 rounded-lg flex flex-col space-y-4 border-glow-cyan">
+                    <h3 class="text-xs font-bold text-cyber-light uppercase tracking-widest border-b border-cyber-border pb-2">
+                        <i class="fa-solid fa-shield-cat text-cyber-cyan mr-1"></i> Analizador de Entropía y Fortaleza
+                    </h3>
+                    <div class="space-y-2">
+                        <label class="text-xs text-cyber-text">Evaluar contraseña:</label>
+                        <input type="password" id="pwd-input" oninput="analyzePassword()" placeholder="Introduce contraseña a evaluar..." class="w-full bg-cyber-dark border border-cyber-border px-3 py-2 rounded text-cyber-light text-xs font-mono focus:outline-none focus:border-cyber-cyan" />
+                    </div>
+                    <div class="bg-cyber-dark p-4 rounded border border-cyber-border space-y-3">
+                        <div class="flex justify-between items-center text-xs">
+                            <span class="text-cyber-text">Nivel de Fortaleza:</span>
+                            <span id="pwd-strength" class="font-bold text-cyber-yellow">MUY DÉBIL</span>
+                        </div>
+                        <div class="w-full bg-cyber-border h-2 rounded overflow-hidden">
+                            <div id="pwd-bar" class="bg-cyber-yellow h-full w-[10%] transition-all"></div>
+                        </div>
+                        <div class="grid grid-cols-2 gap-2 pt-2 text-xs font-mono">
+                            <div class="bg-cyber-card p-2 rounded border border-cyber-border">
+                                <span class="text-cyber-text block text-[10px]">Entropía estimada:</span>
+                                <span id="pwd-entropy" class="text-cyber-cyan font-bold">0 bits</span>
+                            </div>
+                            <div class="bg-cyber-card p-2 rounded border border-cyber-border">
+                                <span class="text-cyber-text block text-[10px]">Tiempo de crack (GPU):</span>
+                                <span id="pwd-time" class="text-cyber-magenta font-bold">Instantáneo</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="pwd-feedback" class="text-[11px] text-cyber-text/80 bg-cyber-dark p-3 rounded border border-cyber-border">
+                        > Añade mayúsculas, números y símbolos para incrementar la seguridad.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="tab-headers" class="tab-content hidden flex-1 flex flex-col space-y-4">
+            <div class="bg-cyber-card border border-cyber-border p-5 rounded-lg border-glow-cyan">
+                <h2 class="text-sm font-bold text-cyber-light uppercase tracking-wider mb-2 flex items-center">
+                    <i class="fa-solid fa-file-shield text-cyber-cyan mr-2"></i> Verificador de Cabeceras HTTP de Seguridad
+                </h2>
+                <p class="text-xs text-cyber-text mb-4">Analiza si un sitio web implementa cabeceras críticas de protección.</p>
+                <div class="flex flex-col sm:flex-row gap-2">
+                    <input type="text" id="url-input" placeholder="Ej. https://github.com o https://cloudflare.com" class="flex-1 bg-cyber-dark border border-cyber-border px-3.5 py-2.5 rounded text-cyber-light text-xs font-mono focus:outline-none focus:border-cyber-cyan" />
+                    <button onclick="checkHeaders()" class="px-5 py-2.5 bg-cyber-cyan text-cyber-dark font-bold rounded text-xs hover:opacity-90 transition flex items-center justify-center space-x-2">
+                        <i class="fa-solid fa-shield-check"></i><span>VERIFICAR CABECERAS</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="bg-cyber-card border border-cyber-border p-5 rounded-lg flex flex-col space-y-3">
+                <div class="flex justify-between items-center border-b border-cyber-border pb-2 text-xs font-bold text-cyber-light">
+                    <span>CABECERA HTTP</span>
+                    <span>ESTADO / RECOMENDACIÓN</span>
+                </div>
+                <div id="headers-report" class="space-y-2 text-xs font-mono">
+                    <div class="p-3 bg-cyber-dark rounded border border-cyber-border flex justify-between items-center">
+                        <div>
+                            <span class="font-bold text-cyber-light">Strict-Transport-Security (HSTS)</span>
+                            <div class="text-[10px] text-cyber-text">Fuerza conexiones HTTPS obligatorias.</div>
+                        </div>
+                        <span class="text-cyber-text/60">Introduce una URL para escanear</span>
+                    </div>
+                    <div class="p-3 bg-cyber-dark rounded border border-cyber-border flex justify-between items-center">
+                        <div>
+                            <span class="font-bold text-cyber-light">Content-Security-Policy (CSP)</span>
+                            <div class="text-[10px] text-cyber-text">Mitiga ataques XSS e inyección de código.</div>
+                        </div>
+                        <span class="text-cyber-text/60">Introduce una URL para escanear</span>
+                    </div>
+                    <div class="p-3 bg-cyber-dark rounded border border-cyber-border flex justify-between items-center">
+                        <div>
+                            <span class="font-bold text-cyber-light">X-Frame-Options</span>
+                            <div class="text-[10px] text-cyber-text">Protege contra ataques de Clickjacking.</div>
+                        </div>
+                        <span class="text-cyber-text/60">Introduce una URL para escanear</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="tab-net" class="tab-content hidden flex-1 flex flex-col space-y-4">
+            <div class="bg-cyber-card border border-cyber-border p-5 rounded-lg border-glow-cyan">
+                <h2 class="text-sm font-bold text-cyber-light uppercase tracking-wider mb-2 flex items-center">
+                    <i class="fa-solid fa-wifi text-cyber-cyan mr-2"></i> Network Defense & Local Monitor
+                </h2>
+                <p class="text-xs text-cyber-text mb-4">Monitorea el estado de la conexión, latencia, DNS y salud de la red local sin escanear redes ajenas ni acceder a información externa no autorizada.</p>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4">
+                    <div class="bg-cyber-dark border border-cyber-border rounded p-3">
+                        <div class="text-[10px] uppercase tracking-widest text-cyber-text mb-1">Estado de red</div>
+                        <div id="net-status" class="text-sm font-bold text-cyber-yellow font-mono">VERIFICANDO...</div>
+                    </div>
+                    <div class="bg-cyber-dark border border-cyber-border rounded p-3">
+                        <div class="text-[10px] uppercase tracking-widest text-cyber-text mb-1">Historial</div>
+                        <div id="net-history" class="text-xs font-mono text-cyber-light">Sin datos aún</div>
+                    </div>
+                </div>
+                <div class="flex flex-col sm:flex-row gap-2">
+                    <button onclick="monitorNetwork()" class="px-5 py-2.5 bg-cyber-cyan text-cyber-dark font-bold rounded text-xs hover:opacity-90 transition flex items-center justify-center space-x-2">
+                        <i class="fa-solid fa-arrows-rotate"></i><span>ACTUALIZAR RED</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
+                <div class="bg-cyber-card border border-cyber-border p-4 rounded-lg">
+                    <div class="text-[10px] text-cyber-text uppercase tracking-widest mb-1">Conexión</div>
+                    <div id="net-connection" class="text-sm font-bold text-cyber-cyan font-mono">Analizando...</div>
+                </div>
+                <div class="bg-cyber-card border border-cyber-border p-4 rounded-lg">
+                    <div class="text-[10px] text-cyber-text uppercase tracking-widest mb-1">Señal / Calidad</div>
+                    <div id="net-signal" class="text-sm font-bold text-cyber-yellow font-mono">Analizando...</div>
+                </div>
+                <div class="bg-cyber-card border border-cyber-border p-4 rounded-lg">
+                    <div class="text-[10px] text-cyber-text uppercase tracking-widest mb-1">Latencia</div>
+                    <div id="net-latency" class="text-sm font-bold text-cyber-green font-mono">Analizando...</div>
+                </div>
+                <div class="bg-cyber-card border border-cyber-border p-4 rounded-lg">
+                    <div class="text-[10px] text-cyber-text uppercase tracking-widest mb-1">Riesgo</div>
+                    <div id="net-risk" class="text-sm font-bold text-cyber-magenta font-mono">Analizando...</div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                <div class="bg-cyber-card border border-cyber-border p-4 rounded-lg">
+                    <div class="text-xs text-cyber-text font-bold uppercase mb-2">DNS / Resolución</div>
+                    <div id="net-dns" class="text-xs text-cyber-light font-mono bg-cyber-dark p-3 rounded border border-cyber-border min-h-[100px]">
+                        > Esperando análisis...
+                    </div>
+                </div>
+                <div class="bg-cyber-card border border-cyber-border p-4 rounded-lg">
+                    <div class="text-xs text-cyber-text font-bold uppercase mb-2">Puertos & Servicios</div>
+                    <div id="net-ports" class="text-xs text-cyber-light font-mono bg-cyber-dark p-3 rounded border border-cyber-border min-h-[100px]">
+                        > Esperando análisis...
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="tab-defense" class="tab-content hidden flex-1 flex flex-col space-y-4">
+            <div class="bg-cyber-card border border-cyber-border p-5 rounded-lg border-glow-cyan">
+                <h2 class="text-sm font-bold text-cyber-light uppercase tracking-wider mb-2 flex items-center">
+                    <i class="fa-solid fa-shield-heart text-cyber-cyan mr-2"></i> Defense / Hardening
+                </h2>
+                <p class="text-xs text-cyber-text mb-4">Checklist defensivo para reforzar la seguridad del sistema y reducir exposición a riesgos comunes.</p>
+                <button onclick="renderDefenseStatus()" class="px-5 py-2.5 bg-cyber-cyan text-cyber-dark font-bold rounded text-xs hover:opacity-90 transition flex items-center justify-center space-x-2">
+                    <i class="fa-solid fa-rotate"></i><span>ACTUALIZAR DEFENSA</span>
+                </button>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
+                <div class="bg-cyber-card border border-cyber-border p-4 rounded-lg">
+                    <div class="text-[10px] text-cyber-text uppercase tracking-widest mb-1">HTTPS</div>
+                    <div id="def-https" class="text-sm font-bold text-cyber-green font-mono">VERIFICANDO...</div>
+                </div>
+                <div class="bg-cyber-card border border-cyber-border p-4 rounded-lg">
+                    <div class="text-[10px] text-cyber-text uppercase tracking-widest mb-1">Contraseñas</div>
+                    <div id="def-pass" class="text-sm font-bold text-cyber-yellow font-mono">VERIFICANDO...</div>
+                </div>
+                <div class="bg-cyber-card border border-cyber-border p-4 rounded-lg">
+                    <div class="text-[10px] text-cyber-text uppercase tracking-widest mb-1">Cabeceras</div>
+                    <div id="def-headers" class="text-sm font-bold text-cyber-cyan font-mono">VERIFICANDO...</div>
+                </div>
+                <div class="bg-cyber-card border border-cyber-border p-4 rounded-lg">
+                    <div class="text-[10px] text-cyber-text uppercase tracking-widest mb-1">Estado general</div>
+                    <div id="def-score" class="text-sm font-bold text-cyber-magenta font-mono">VERIFICANDO...</div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                <div class="bg-cyber-card border border-cyber-border p-4 rounded-lg">
+                    <div class="text-xs text-cyber-text font-bold uppercase mb-2">Checklist defensivo</div>
+                    <div id="def-checklist" class="text-xs text-cyber-light font-mono bg-cyber-dark p-3 rounded border border-cyber-border min-h-[140px]">
+                        > Cargando checklist...
+                    </div>
+                </div>
+                <div class="bg-cyber-card border border-cyber-border p-4 rounded-lg">
+                    <div class="text-xs text-cyber-text font-bold uppercase mb-2">Recomendaciones</div>
+                    <div id="def-recommend" class="text-xs text-cyber-light font-mono bg-cyber-dark p-3 rounded border border-cyber-border min-h-[140px]">
+                        > Cargando recomendaciones...
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                <div class="bg-cyber-card border border-cyber-border p-4 rounded-lg">
+                    <div class="text-xs text-cyber-text font-bold uppercase mb-2 text-cyber-green">Sí se puede hacer</div>
+                    <div id="def-allowed" class="text-xs text-cyber-light font-mono bg-cyber-dark p-3 rounded border border-cyber-border min-h-[140px]">
+                        > Cargando permisos y análisis válidos...
+                    </div>
+                </div>
+                <div class="bg-cyber-card border border-cyber-border p-4 rounded-lg">
+                    <div class="text-xs text-cyber-text font-bold uppercase mb-2 text-cyber-magenta">No se puede hacer</div>
+                    <div id="def-blocked" class="text-xs text-cyber-light font-mono bg-cyber-dark p-3 rounded border border-cyber-border min-h-[140px]">
+                        > Cargando restricciones del navegador y del sistema...
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="bg-cyber-dark border-t border-cyber-border py-3 px-4 text-center text-xs text-cyber-text z-30 flex flex-wrap justify-between items-center">
+        <div>CtOS Professional Security Suite // SecOps & Incident Response</div>
+        <div class="flex space-x-4">
+            <span class="text-cyber-cyan"><i class="fa-solid fa-shield-halved mr-1"></i> STATUS: ACTIVE</span>
+            <span>ENCRYPTED SESSION</span>
+        </div>
+    </footer>
+
+    <div id="code-window" class="hidden fixed bottom-20 right-4 w-[420px] max-h-[72vh] bg-cyber-card/95 border border-cyber-cyan/40 rounded-lg shadow-2xl z-50 backdrop-blur-md">
+        <div class="flex items-center justify-between px-3 py-2 border-b border-cyber-border bg-cyber-dark/80 rounded-t-lg">
+            <div class="flex items-center space-x-2 text-cyber-cyan text-[11px] font-bold">
+                <i class="fa-solid fa-code"></i>
+                <span>PAGE_SOURCE</span>
+            </div>
+            <button onclick="toggleCodeWindow()" class="text-cyber-text hover:text-cyber-cyan text-sm">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+
+        <div class="px-3 py-2 border-b border-cyber-border bg-cyber-dark/40">
+            <div class="flex items-center gap-2">
+                <input id="code-url-input" type="text" value="https://example.com" placeholder="https://dominio.com" class="flex-1 bg-cyber-dark border border-cyber-border px-2 py-1.5 rounded text-[11px] text-cyber-light font-mono focus:outline-none focus:border-cyber-cyan" />
+                <button onclick="loadCodeSource()" class="px-2 py-1.5 bg-cyber-cyan text-cyber-dark text-[10px] font-bold rounded hover:opacity-90">CARGAR</button>
+            </div>
+            <button onclick="applyCodeEdit()" class="mt-2 px-2 py-1 bg-cyber-card border border-cyber-border text-[10px] text-cyber-light rounded hover:border-cyber-cyan hover:text-cyber-cyan">APLICAR CAMBIOS</button>
+        </div>
+
+        <div class="grid grid-cols-1 gap-2 p-2">
+            <div class="border border-cyber-border rounded bg-cyber-dark/70 overflow-hidden">
+                <div class="px-2 py-1 text-[10px] uppercase tracking-wider text-cyber-cyan border-b border-cyber-border">Código</div>
+                <textarea id="code-content" class="w-full h-[190px] bg-cyber-dark text-[10px] leading-5 text-cyber-light p-3 font-mono resize-none focus:outline-none" spellcheck="false"></textarea>
+            </div>
+            <div class="border border-cyber-border rounded bg-cyber-dark/70 overflow-hidden">
+                <div class="px-2 py-1 text-[10px] uppercase tracking-wider text-cyber-cyan border-b border-cyber-border">Ejecución</div>
+                <iframe id="code-preview-frame" title="Preview del dominio" class="w-full h-[170px] bg-white" sandbox="allow-scripts allow-same-origin allow-popups"></iframe>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js" defer></script>
+</body>
+</html>
